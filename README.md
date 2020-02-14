@@ -43,4 +43,4 @@ This script generate 2 files:
 ./apply.sh "commit message"
 ```
 
-> :tada: create your PR :cake:
+### :tada: create your PR :cake:
