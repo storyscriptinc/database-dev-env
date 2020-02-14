@@ -26,14 +26,14 @@ PG_PASSWORD=postgres
 PG_DB=storyscript
 ```
 
-> do your changes 
+Make your changes
 
 > run the auto-migration script using [migra](https://djrobstep.com/docs/migra)
 ```bash
 ./migrate.sh
 ```
 
-> :warn: **here you may need to review the generated files to make sure they're valid**
+:warning: **here you may need to review the generated files to make sure they're valid**
 
 > apply the changes to the database repo
 ```bash
