@@ -1,0 +1,107 @@
+version: '3.7'
+
+services:
+  database:
+    image: postgres:10
+    container_name: database
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U postgres']
+      interval: 3s
+      timeout: 2s
+      retries: 7
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=storyscript
+    ports:
+      - 5432:5432
+    networks:
+      - storynet
+
+  database-changes:
+    image: postgres:10
+    container_name: database-changes
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U postgres']
+      interval: 3s
+      timeout: 2s
+      retries: 7
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=storyscript
+    ports:
+      - 5433:5432
+    networks:
+      - storynet
+
+  start-database:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - database
+    command: database:5432
+    networks:
+      - storynet
+
+  start-database-changes:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - database-changes
+    command: database-changes:5433
+    networks:
+      - storynet
+
+  migrations:
+    image: storyscript/database:latest
+    depends_on:
+      - start-database
+    environment:
+      DATABASE_URL: db:pg://postgres:postgres@database/storyscript
+      PGOPTIONS: "-c storyscript.graphql_authenticator_username=storyscript-ci -c storyscript.graphql_authenticator_password=storyscript-ci-pwd"
+    networks:
+      - storynet
+
+  migrations-changes:
+    image: storyscript/database:latest
+    depends_on:
+      - start-database-changes
+    environment:
+      DATABASE_URL: db:pg://postgres:postgres@database-changes/storyscript
+      PGOPTIONS: "-c storyscript.graphql_authenticator_username=storyscript-ci -c storyscript.graphql_authenticator_password=storyscript-ci-pwd"
+    networks:
+      - storynet
+
+  graphql:
+    image: storyscript/graphql:latest
+    depends_on:
+      - migrations
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: postgresql://storyscript-ci:storyscript-ci-pwd@database/storyscript
+      AUTH_COOKIE_NAME: storyscript-access-token
+      JWT_VERIFICATION_KEY: secret
+      WHITELIST_DOMAINS_REGEXP: '^http[s]*:\/\/([\w\-\.]*)localhost(:[38]0([0-9][0-9])?)?$$'
+    networks:
+      - storynet
+
+  graphql-changes:
+    image: storyscript/graphql:latest
+    depends_on:
+      - migrations-changes
+    ports:
+      - 3001:3000
+    environment:
+      DATABASE_URL: postgresql://storyscript-ci:storyscript-ci-pwd@database-changes/storyscript
+      AUTH_COOKIE_NAME: storyscript-access-token
+      JWT_VERIFICATION_KEY: secret
+      WHITELIST_DOMAINS_REGEXP: '^http[s]*:\/\/([\w\-\.]*)localhost(:[38]0([0-9][0-9])?)?$$'
+    networks:
+      - storynet
+
+
+networks:
+  storynet:
+    external: false
+    driver: bridge
+    name: storynet
