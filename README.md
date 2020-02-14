@@ -12,7 +12,7 @@ scripts to easily make changes to the storyscript/database
 
 > run the init script to init a migration
 ```bash
-./init.sh migration-name
+./init.sh {migration-name}
 ```
 It automaticly pull the repo if needed, create the migration, create your branch and run the 2 databases with a graphql server
 
@@ -32,6 +32,9 @@ Make your changes
 ```bash
 ./migrate.sh
 ```
+This script generate 2 files:
+- `database/deploy/{migration-name}.sql`: contains the migrations
+- `database/revert/{migration-name}.sql`: contains the revertions
 
 :warning: **here you may need to review the generated files to make sure they're valid**
 
