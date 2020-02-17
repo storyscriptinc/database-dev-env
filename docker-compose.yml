@@ -52,7 +52,7 @@ services:
       - storynet
 
   migrations:
-    image: storyscript/database:latest
+    image: storyscript/schema:latest
     depends_on:
       - start-database
     environment:
@@ -62,7 +62,7 @@ services:
       - storynet
 
   migrations-changes:
-    image: storyscript/database:latest
+    image: storyscript/schema:latest
     depends_on:
       - start-database-changes
     environment:

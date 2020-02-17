@@ -1,6 +1,6 @@
 #!/bin/bash
 
-migration_name=$(ls ./database/deploy | grep sql | head -1 | cut -d . -f 1)
+migration_name=$(cat ./database/sqitch.plan | tail -n 1 | cut -d " " -f 1)
 
 echo "getting migrations for $migration_name"
 
