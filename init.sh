@@ -14,6 +14,7 @@ fi
 cd database
 
 git checkout master # make sure we are on master
+git pull origin master
 git checkout -b feat/$migration_name
 
 sqitch add -c $migration_name
