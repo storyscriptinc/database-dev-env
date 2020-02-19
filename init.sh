@@ -21,4 +21,6 @@ sqitch add -c $migration_name
 
 cd ..
 
+docker-compose down
+docker-compose pull
 docker-compose up -d
